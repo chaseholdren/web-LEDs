@@ -15,9 +15,7 @@ TBlendType currentBlending;
 
 void setup()
 {
-  Serial.println("setup1");
   delay(3000); // power-up safety delay
-  Serial.println("setup2");
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);
 
@@ -32,19 +30,16 @@ void setup()
   // leds[colorIndex % NUM_LEDS] = CRGB::Red;
 
   // FastLED.show();
-  Serial.println("setup3");
   Serial.begin(115200);
-  Serial.println("setup4");
+  Serial.println("OK");
 }
 
 void loop()
 {
   if (Serial.available() > 0)
   {
+
     int inputString = Serial.parseInt();
-    Serial.flush();
-    Serial.println(inputString);
-    // colorIndex = colorIndex + 1; /* motion speed */
     if (inputString > 0 && inputString < NUM_LEDS)
     {
 
@@ -53,6 +48,9 @@ void loop()
 
       FastLED.show();
     }
+
+    Serial.println(inputString);
+    Serial.println("OK");
   }
-  // delay(1000);
+  FastLED.delay(1000 / UPDATES_PER_SECOND);
 }
