@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include <FastLED.h>
+#include <ArduinoJson.h>
+#include <SPI.h>
 
 #define LED_PIN 8
 #define NUM_LEDS 256
@@ -10,47 +12,66 @@ CRGB leds[NUM_LEDS];
 
 #define UPDATES_PER_SECOND 100
 
-CRGBPalette16 currentPalette;
-TBlendType currentBlending;
-
 void setup()
 {
   delay(3000); // power-up safety delay
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);
 
-  currentPalette = LavaColors_p;
-  currentBlending = LINEARBLEND;
+  leds[0] = CRGB::White;
+
+  FastLED.show();
   while (!Serial)
   {
     ; // wait for serial port to connect. Needed for native USB
   }
-
-  // static uint8_t colorIndex = 255;
-  // leds[colorIndex % NUM_LEDS] = CRGB::Red;
-
-  // FastLED.show();
   Serial.begin(115200);
   Serial.println("OK");
 }
 
+// String inputString = ""; // a String to hold incoming data
+
 void loop()
 {
-  if (Serial.available() > 0)
+  String inputString = "";
+
+  if (Serial.available())
   {
+    inputString = String(Serial.readString());
+    inputString.concat("/0");
+  }
 
-    int inputString = Serial.parseInt();
-    if (inputString > 0 && inputString < NUM_LEDS)
+  if (inputString != "")
+  {
+    Serial.println("input string:");
+    Serial.println(inputString);
+    FastLED.clear();
+
+    // Allocate JsonBuffer
+    // Use arduinojson.org/assistant to compute the capacity.
+    const size_t capacity = JSON_ARRAY_SIZE(3) + 3 * JSON_OBJECT_SIZE(3);
+    DynamicJsonBuffer jsonBuffer(capacity);
+
+    // Parse JSON object
+    JsonArray& root = jsonBuffer.parseArray(inputString);
+    const int arraySize = constrain(root.size(), 0, NUM_LEDS);
+    Serial.println("array size:");
+    Serial.println(arraySize);
+
+    for (int i = 0; i < arraySize; i++)
     {
-
-      FastLED.clear();
-      leds[inputString % NUM_LEDS] = CRGB::Red;
-
-      FastLED.show();
+      JsonObject& ledObject = root[i];
+      Serial.println("\nled object:");
+      ledObject.printTo(Serial);
+      Serial.println("\n");
+      leds[i] = CRGB(ledObject["red"], ledObject["green"], ledObject["blue"]);
     }
 
-    Serial.println(inputString);
+    jsonBuffer.clear();
+
+    // inputString = "";
+    FastLED.show();
     Serial.println("OK");
   }
-  FastLED.delay(1000 / UPDATES_PER_SECOND);
+  // FastLED.delay(1000 / UPDATES_PER_SECOND);
 }

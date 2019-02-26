@@ -2,7 +2,7 @@ const SerialPort = require('serialport');
 
 const init = () => {
     const port = new SerialPort(process.env.ARDUINO_SERIAL_PORT, {
-        baudRate: process.env.ARDUINO_BAUDRATE,
+        baudRate: parseInt(process.env.ARDUINO_BAUDRATE),
     }, (error) => {
         if (error) {
             console.log('Error opening port: ', error.message)
