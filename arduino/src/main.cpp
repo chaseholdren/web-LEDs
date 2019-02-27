@@ -41,8 +41,6 @@ void loop()
 
     if (colorCount != 0)
     {
-      Serial.println(String(colorCount));
-
       for (int i = 0; i < colorCount; i++)
       {
         // Allocate JsonBuffer
@@ -54,7 +52,6 @@ void loop()
         JsonObject &colorData = jsonBuffer.parseObject(Serial);
         if (colorData.success())
         {
-          Serial.println("boop");
           leds[i] = CRGB(colorData["red"], colorData["green"], colorData["blue"]);
         }
       }

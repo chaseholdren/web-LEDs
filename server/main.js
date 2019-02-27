@@ -28,25 +28,13 @@ const trySendData = (ledData) => {
 
     isSerialPortReady = false;
 
-    ledData = [
-        {
-            blue: 255,
-            green: 0,
-            red: 0
-        },
-        {
-            blue: 0,
-            green: 255,
-            red: 0
-        },
-        {
-            blue: 0,
-            green: 0,
-            red: 255
-        },
-    ];
+    let ledDataString = `${ledData.length}`;
 
-    const ledDataString = JSON.stringify(ledData);
+    for (const ledDataObject of ledData) {
+        ledDataString += JSON.stringify(ledDataObject);
+
+    }
+
     console.log(`\nSending data: ${ledDataString}`);
     serialport.write(ledDataString);
 
