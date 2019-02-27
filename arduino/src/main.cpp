@@ -5,7 +5,7 @@
 
 #define LED_PIN 8
 #define NUM_LEDS 256
-#define BRIGHTNESS 100
+#define BRIGHTNESS 25
 #define LED_TYPE WS2811
 #define COLOR_ORDER GRB
 CRGB leds[NUM_LEDS];
@@ -26,6 +26,7 @@ void setup()
     ; // wait for serial port to connect. Needed for native USB
   }
   Serial.begin(115200);
+  Serial.setTimeout(5000);
   Serial.println("OK");
 }
 
@@ -33,45 +34,34 @@ void setup()
 
 void loop()
 {
-  String inputString = "";
 
   if (Serial.available())
   {
-    inputString = String(Serial.readString());
-    inputString.concat("/0");
-  }
+    const int colorCount = Serial.parseInt();
 
-  if (inputString != "")
-  {
-    Serial.println("input string:");
-    Serial.println(inputString);
-    FastLED.clear();
-
-    // Allocate JsonBuffer
-    // Use arduinojson.org/assistant to compute the capacity.
-    const size_t capacity = JSON_ARRAY_SIZE(3) + 3 * JSON_OBJECT_SIZE(3);
-    DynamicJsonBuffer jsonBuffer(capacity);
-
-    // Parse JSON object
-    JsonArray& root = jsonBuffer.parseArray(inputString);
-    const int arraySize = constrain(root.size(), 0, NUM_LEDS);
-    Serial.println("array size:");
-    Serial.println(arraySize);
-
-    for (int i = 0; i < arraySize; i++)
+    if (colorCount != 0)
     {
-      JsonObject& ledObject = root[i];
-      Serial.println("\nled object:");
-      ledObject.printTo(Serial);
-      Serial.println("\n");
-      leds[i] = CRGB(ledObject["red"], ledObject["green"], ledObject["blue"]);
+      Serial.println(String(colorCount));
+
+      for (int i = 0; i < colorCount; i++)
+      {
+        // Allocate JsonBuffer
+        // Use arduinojson.org/assistant to compute the capacity.
+        const int capacity = JSON_OBJECT_SIZE(3) + 30;
+        StaticJsonBuffer<capacity> jsonBuffer;
+
+        // Parse JSON object
+        JsonObject &colorData = jsonBuffer.parseObject(Serial);
+        if (colorData.success())
+        {
+          Serial.println("boop");
+          leds[i] = CRGB(colorData["red"], colorData["green"], colorData["blue"]);
+        }
+      }
+      FastLED.show();
+
+      Serial.println("OK");
     }
-
-    jsonBuffer.clear();
-
-    // inputString = "";
-    FastLED.show();
-    Serial.println("OK");
   }
   // FastLED.delay(1000 / UPDATES_PER_SECOND);
 }
