@@ -26,11 +26,8 @@ void setup()
     ; // wait for serial port to connect. Needed for native USB
   }
   Serial.begin(115200);
-  Serial.setTimeout(5000);
   Serial.println("OK");
 }
-
-// String inputString = ""; // a String to hold incoming data
 
 void loop()
 {
@@ -60,5 +57,4 @@ void loop()
       Serial.println("OK");
     }
   }
-  // FastLED.delay(1000 / UPDATES_PER_SECOND);
 }

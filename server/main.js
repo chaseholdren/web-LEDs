@@ -35,7 +35,7 @@ const trySendData = (ledData) => {
 
     }
 
-    console.log(`\nSending data: ${ledDataString}`);
+    console.log('\nSending led data');
     serialport.write(ledDataString);
 
     clearInterval(sendDataInterval);
