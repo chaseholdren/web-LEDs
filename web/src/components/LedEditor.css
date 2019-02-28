@@ -1,0 +1,32 @@
+.led-grid {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    width: 94.72vw;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.led-square {
+    width: 2.96vw;
+    height: 2.96vw;
+    outline: solid 1px black;
+}
+
+.color-picker {
+    display: flex;
+    flex-direction: row;
+}
+
+.current-color {
+    margin: 25px;
+    width: 100px;
+    height: 100px;
+    outline: solid 1px black;
+}
+
+.color-text-inputs {
+    margin: 25px;
+}

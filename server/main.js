@@ -15,6 +15,8 @@ firestoreDatabase.collection("ledData").doc("jstJk4unCGziTWsAT3F0")
             ledData
         } = doc.data();
 
+        if (sendDataInterval !== null) clearInterval(sendDataInterval);
+
         if (isSerialPortReady) {
             trySendData(ledData);
         } else {
