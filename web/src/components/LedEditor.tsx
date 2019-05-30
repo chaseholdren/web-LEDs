@@ -1,6 +1,7 @@
 import React, { ReactHTML } from 'react';
-import { firestore } from '../firebaseInit';
 import './LedEditor.css';
+import firebase from 'firebase/app';
+import 'firebase/firestore';
 
 interface ledData {
     red: number;
@@ -11,8 +12,6 @@ interface ledData {
 interface ledDocument {
     ledData: ledData[];
 }
-
-
 
 const LedSquare = ({ ledData, onClick }: { ledData: ledData, onClick: () => void }) => {
     const backgroundColor = `rgb(${ledData.red}, ${ledData.green}, ${ledData.blue})`;
@@ -39,13 +38,25 @@ class LedEditor extends React.Component<Props, State> {
         ledDataList: [],
     }
 
+    firestore: firebase.firestore.Firestore | null = null;
+
     unsubscribeFromFirestore?: () => void;
 
     componentDidMount = () => {
-        this.unsubscribeFromFirestore = firestore.collection('ledData').doc("jstJk4unCGziTWsAT3F0").onSnapshot(doc => {
-            const ledDocument = doc.data() as ledDocument;
-            this.handleUpdateFromFirestore(ledDocument.ledData);
-        });
+        const firebaseInitUrl = process.env.NODE_ENV === 'development' ? "dev-firebase-config.json" : '/__/firebase/init.json';
+
+        fetch(firebaseInitUrl)
+            .then(firebaseConfigResponse => firebaseConfigResponse.json())
+            .then(firebaseConfigJson => {
+                firebase.initializeApp(firebaseConfigJson);
+
+                this.firestore = firebase.firestore();
+
+                this.unsubscribeFromFirestore = this.firestore.collection('ledData').doc("jstJk4unCGziTWsAT3F0").onSnapshot(doc => {
+                    const ledDocument = doc.data() as ledDocument;
+                    this.handleUpdateFromFirestore(ledDocument.ledData);
+                });
+            });
     }
 
     componentWillUnmount = () => {
@@ -59,11 +70,12 @@ class LedEditor extends React.Component<Props, State> {
     }
 
     handleLedClick = (index: number) => {
-        console.log(index);
-        const {ledDataList} = this.state;
+        if (this.firestore === null) return;
+
+        const { ledDataList } = this.state;
         const newLedDataList = Object.assign([], ledDataList) as ledData[];
         newLedDataList[index] = this.state.brushColor;
-        firestore.collection("ledData").doc("jstJk4unCGziTWsAT3F0").set({
+        this.firestore.collection("ledData").doc("jstJk4unCGziTWsAT3F0").set({
             ledData: newLedDataList,
         });
     }
@@ -103,7 +115,7 @@ class LedEditor extends React.Component<Props, State> {
                     <div className='color-text-inputs'>
                         <div>
                             Red
-                            <input type='text' value={brushColor.red} onChange={(event) => { this.handleCurrentColorChange('red', event);}} />
+                            <input type='text' value={brushColor.red} onChange={(event) => { this.handleCurrentColorChange('red', event); }} />
                         </div>
                         <div>
                             Green

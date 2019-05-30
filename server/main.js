@@ -1,7 +1,6 @@
 require('dotenv').config();
 const Readline = require('@serialport/parser-readline');
 require('./firebase/init').default();
-// firebaseInit();
 const serialport = require('./serial-port/init').default();
 const firebase = require("firebase");
 const firestoreDatabase = firebase.firestore();
