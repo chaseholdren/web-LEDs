@@ -8,6 +8,10 @@ class App extends Component {
     return (
       <div className="App">
         <LedEditor/>
+        <div className="Pics">
+          <img src="/img/1.jpg" alt="LED Grid" />
+          <img src="/img/2.jpg" alt="LED Grid" />
+        </div>
       </div>
     );
   }
